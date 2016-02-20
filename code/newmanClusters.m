@@ -20,5 +20,12 @@ for i = 1 : max(M) % collecting statistics
     statisticsNewmanCell{4,i} = std2(mat);
 end
 disp('Newman Q = '), disp(Q)
+
+% graph of clusters
+ROIcoordsSC = dlmread('./data/UCLA_Autism_TD132_CCN_DTI_region_xyz_centers.txt');
+Nclstrs = figure('name', 'newman clusters');
+figure(Nclstrs);
+colormap(jet);
+scatter3(ROIcoordsSC(:,1),ROIcoordsSC(:,2),ROIcoordsSC(:,3),30,M,'filled');
 end
 

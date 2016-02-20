@@ -30,6 +30,10 @@ for i = 1 : numClusters % collecting statistics
     statisticsSpectralCell{3,i} = mean2(mat);
     statisticsSpectralCell{4,i} = std2(mat);
 end
-
+% ROIcoordsSC = dlmread('./data/UCLA_Autism_TD132_CCN_DTI_region_xyz_centers.txt');
+% Nclstrs = figure('name', 'newman clusters');
+% figure(Nclstrs);
+% colormap(jet);
+% scatter3(ROIcoordsSC(:,1),ROIcoordsSC(:,2),ROIcoordsSC(:,3),30,M,'filled');
 end
 

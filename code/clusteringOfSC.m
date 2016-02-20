@@ -1,10 +1,11 @@
+cd /Users/govinda/Desktop/spring2016/
 %% Clustering of structural connectivity matrix 
 close all
 clc
 % initializations
 addpath(genpath('/Users/govinda/Desktop/IIIT_H/II_Semester/Research/ToolBoxes/BCT/')); % added BCT toolbox
-W = dlmread('/Users/govinda/Desktop/winter2015-master/Code/UCLA_Autism_TD128B_DTI_connectmat.txt');
-FC = dlmread('/Users/govinda/Desktop/winter2015-master/Code/UCLA_Autism_TD128_rsfMRI_connectmat.txt');
+W = dlmread('./data/UCLA_Autism_TD132_CCN_DTI_connectmat.txt');
+FC = dlmread('./data/UCLA_Autism_TD132_CCN_rsfMRI_connectmat.txt');
 FC(isinf(FC)) = 0;
 
 % Louvian method
@@ -13,6 +14,7 @@ statisticsLouvianCell = communityLouvainClusters(W, FC);
 % Spectral methods
 statisticsSpectralRWCell = spectralClustersRW(W, FC);
 statisticsSpectralSymmCell = spectralClustersSymm(W, FC);
+
 % Newman method
 statisticsNewmanCell = newmanClusters(W, FC);
 %% Methods comparison
@@ -42,6 +44,7 @@ mN = zeros(1,size(statisticsNewmanCell,2));
 stdmN = zeros(1,size(statisticsNewmanCell,2));
 for i = 1 : size(statisticsNewmanCell,2)
     mN(i) = statisticsNewmanCell{3,i};
+    stdmN(i) = statisticsNewmanCell{4,i};
 end
 [mN,ind] = sort(mN); stdmN = stdmN(ind);
 figure, plot(sort(mN)), title('Newman Method'); xlabel('cluster index'); ylabel('FC meann values');
