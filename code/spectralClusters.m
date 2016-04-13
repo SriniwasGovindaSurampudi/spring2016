@@ -1,35 +1,39 @@
-function [ statisticsSpectralCell ] = spectralClusters( W,FC )
-%UNTITLED3 Summary of this function goes here
+function [ Ured, idx, centers ] = spectralClusters( W, numClusters, type )
+%UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
+%   This function gives back spectral clusters 
+%   of different types.
+%   usage; [Ured, idx, centers] = spectralClusters(W, numClusters, type)
+%   type:   'unnormalized', 'randomWalk', 'symmetric'
+%   Ured : eigenfunctions used for clustering
+%   idx  : indices of k-means clustering
 
 D = diag(sum(W));
 L = D - W;
-Lrw = D\L;
-[Vec,Val] = eig(Lrw);
 
-[~,ind] = sort(diag(Val));
-Val = Val(:,ind);
-Vec = Vec(:,ind);
-
-plot(sum(Val))
-grid on
-numClusters = input('provide the number of clusters'); % using eigengap to determine number of clusters
-
-[indices] = kmeans(Vec(:,2:numClusters+1),numClusters);
-
-ClusterNodes = cell(1,numClusters);
-statisticsSpectralCell = cell(4,numClusters);
-allNodes = 1 : 264;
-
-for i = 1 : numClusters % collecting statistics
-    nodes = allNodes(indices == i);
-    ClusterNodes{1,i} = nodes;
-    mat = FC(nodes,nodes);
-    statisticsSpectralCell{1,i} = mean(mat);
-    statisticsSpectralCell{2,i} = std(mat);
-    statisticsSpectralCell{3,i} = mean2(mat);
-    statisticsSpectralCell{4,i} = std2(mat);
+switch (type)
+    case 'unnormalized'
+        [U, ~] = eig(L);
+        Ured = U(:,2:min(numClusters + 1,size(W,2)));
+        [idx, centers] = kmeans(Ured, numClusters);
+    case 'randomWalk'
+        [U, Lambda] = eig(D\L);
+        s = sum(Lambda);
+        [~,idx] = sort(s);
+        Lambda = Lambda(:,idx);
+        U = U(:,idx);
+        Ured = U(:,2:min(numClusters + 1,size(W,2)));
+        [idx, centers] = kmeans(Ured, numClusters);
+    case 'symmetric'
+        [U,Lambda] = eig(D^(-0.5)*L*D^(-0.5));
+        s = sum(Lambda);
+        [~,idx] = sort(s);
+        Lambda = Lambda(:,idx);
+        U = U(:,idx);
+        absU = sqrt(sum(U.^2,2));
+        U = bsxfun(@rdivide, U, absU);
+        Ured = U(:, 2:min(numClusters + 1, size(W,2)));
+        [idx, centers] = kmeans(Ured, numClusters);
 end
-
 end
 
