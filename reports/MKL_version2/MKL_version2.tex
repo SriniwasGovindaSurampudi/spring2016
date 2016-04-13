@@ -1,0 +1,101 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[margin=1in, paperwidth=8.5in, paperheight=11in]{geometry}
+
+\title{Multiple kernel Learning, version2}
+
+\author{Govinda Surampudi, Avinash Sharma, Dipanjan Roy}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+In this version, it is hypothesised that 
+\begin{enumerate}
+\item all ROIs have same set of diffusion scales.
+\item for each scale of diffusion, each ROI diffuses at different amplitude.
+\end{enumerate}
+\end{abstract}
+
+\section{Mathematical formulation}
+Given a fixed set of scales for all ROIs, the setup learns a set of $\alpha$ 's. Instead of horizontally stacking all the kernels together in a single matrix and trying to find $\alpha$ matrix, whose many entries are known to be 0, explicit linear combination of kernels weighted with their corresponding $\alpha^{ \left( i \right) l }$'s is used for approximating \textbf{FC} matrices. \\
+Let 'n' be the number of ROIs, and there be 'p' diffusion kernels for each of the 'L' subjects(samples).
+
+\begin{equation*}
+\begin{aligned}
+& \textbf{E} = \Vert \sum_{l = 1}^{L} \left\lbrace 
+\sum_{i = 1}^{p} \textbf{H}_{i}^{l} \alpha^{\left( i \right)l} - \textbf{FC}^{l}
+\right\rbrace \Vert_{F}^{2} && \forall i \in \left( 1,...,p \right) \\
+& \textbf{E} = \| \sum_{l = 1}^{L} \left\lbrace 
+\sum_{j = 1}^{n} \left( 
+\sum_{i = 1}^{p} h_{ij}^{l} \alpha_{j}^{\left( i \right)l} - f_{j}^{l}
+\right) \right\rbrace \|_{F}^{2} && \forall j \in \left( 1,...,n \right) \\
+& \textbf{E} = \| \sum_{j = 1}^{n} \left\lbrace 
+\sum_{l = 1}^{L} \textbf{X}_{j}^{l} \hat{\alpha}_{j}^{l} - f_{j}^{l}
+\right\rbrace \|_{F}^{2} && \forall l \in \left( 1,...,L \right) \\
+&  \textbf{E} = \| \sum_{j = 1}^{n} \mathbf{\Psi}_{j} \hat{\alpha}_{j} - \mathbf{\Phi}_{j}
+\|_{F}^{2} \\
+\end{aligned}
+\end{equation*}
+each $\hat{\alpha}_{j}$ is a least squares solution. Combine $\hat{\alpha}_{j}$ 's into  $\hat{\alpha}^{i}$ 's.
+
+where,
+$$
+\alpha^{\left( i \right)l} = 
+\begin{bmatrix}
+\alpha_{1}^{\left( i \right)l} & \ldots & 0\\
+\vdots & \ddots & \vdots \\
+0 & \ldots & \alpha_{n}^{\left( i \right)l} \\
+\end{bmatrix}_{n \times n}
+$$
+$$
+\textbf{H}_{i}^{l} = 
+\begin{bmatrix}
+h_{i1}^{l} & \cdots & h_{in}^{l} \\
+\end{bmatrix}_{n \times n}
+\text{, }
+\textbf{H}_{i}^{l} \alpha^{\left( i \right)l} = 
+\begin{bmatrix}
+h_{i1}^{l} \alpha_{1}^{\left( i \right)l} & \cdots & h_{in}^{l} \alpha_{n}^{\left( i \right)l} \\
+\end{bmatrix}_{n \times n}
+$$
+$$
+\textbf{X}_{j}^{l} = 
+\begin{bmatrix}
+h_{1j}^{l} & \cdots & h_{pj}^{l} \\
+\end{bmatrix}_{n \times p}
+$$
+$$
+\mathbf{\Psi} = 
+\begin{bmatrix}
+\textbf{X}_{j}^{1} \\
+\vdots \\
+\textbf{X}_{j}^{L} \\
+\end{bmatrix}_{nL \times p} 
+\text{, }
+\mathbf{\Psi} = 
+\begin{bmatrix}
+f_{j}^{1} \\
+\vdots \\
+f_{j}^{L} \\
+\end{bmatrix}_{nL \times 1}
+\text{, }
+\hat{\alpha}_{j}^{l} = 
+\hat{\alpha}_{j} =
+\begin{bmatrix}
+\hat{\alpha}_{j}^{ \left( 1 \right) } \\
+\vdots \\
+\hat{\alpha}_{j}^{ \left( p \right)} \\
+\end{bmatrix}_{p \times 1}
+\forall l \in \left( 1,...,L \right)
+$$
+
+\end{document}
